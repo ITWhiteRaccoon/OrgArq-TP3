@@ -18,6 +18,8 @@ namespace TP3
                 if (args[0] == "-s")
                 {
                     List<string> result = AssembleOperation(args[1], "-a");
+                    Processor processor = new Processor();
+                    processor.Start(result);
                 }
                 else
                 {
