@@ -12,7 +12,7 @@ namespace TP3
     ///     Org. Arq. I - 2020/2 - TP3
     ///     Provides methods to convert from MIPS Assembly to hex code and vice-versa.
     /// </summary>
-    public class Assembler
+    public static class Assembler
     {
         private const int StartAddress = 0x00400000;
 

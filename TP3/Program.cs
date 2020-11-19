@@ -15,16 +15,15 @@ namespace TP3
         {
             if (args.Length >= 3 && File.Exists(args[1]))
             {
-                var result = new List<string>();
-                string[] input = File.ReadAllLines(args[1]);
-                result = args[0] switch
+                if (args[0] == "-s")
                 {
-                    "-a" => Assembler.Assemble(input),
-                    "-d" => Assembler.Disassemble(input),
-                    _ => result
-                };
-
-                File.WriteAllLines(args[2], result);
+                    List<string> result = AssembleOperation(args[1], "-a");
+                }
+                else
+                {
+                    List<string> result = AssembleOperation(args[1], args[0]);
+                    File.WriteAllLines(args[2], result);
+                }
 
                 Console.WriteLine("Sucesso!");
                 return;
@@ -32,6 +31,20 @@ namespace TP3
 
             Console.WriteLine(
                 "Informe pela linha de comando a operação desejada e os caminhos de entrada e saída. (eg.: Program -a example.asm example.txt)");
+        }
+
+        private static List<string> AssembleOperation(string file, string operation)
+        {
+            var result = new List<string>();
+            string[] input = File.ReadAllLines(file);
+            result = operation switch
+            {
+                "-a" => Assembler.Assemble(input),
+                "-d" => Assembler.Disassemble(input),
+                _ => result
+            };
+
+            return result;
         }
     }
 }
