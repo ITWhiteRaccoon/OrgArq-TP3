@@ -6,4 +6,13 @@
         <RootNamespace>TP3</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="ProcessorComponents\Registers.cs">
+        <Link>Processor\Registers.cs</Link>
+      </Compile>
+      <Compile Update="ProcessorComponents\ALU.cs">
+        <Link>Processor\ALU.cs</Link>
+      </Compile>
+    </ItemGroup>
+
 </Project>
