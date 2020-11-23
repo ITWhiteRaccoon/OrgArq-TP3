@@ -68,6 +68,7 @@ namespace TP3
             _regs.Start(false, rs, rt, rd, null, out int r1, out int? r2);
             _alu.Start(aluOp, r1, r2.GetValueOrDefault(), out bool zero, out int result);
             _regs.Start(true, rs, rt, rd, result, out _, out _);
+            Console.WriteLine($"{aluOp.ToString()}");
         }
 
         private void I(string instruction)
