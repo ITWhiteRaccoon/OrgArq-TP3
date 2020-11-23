@@ -12,7 +12,7 @@ namespace TP3
 
         public Processor()
         {
-            _pc = 0x400_000;
+            _pc = 0;
             _regs = new Registers();
             _alu = new ALU();
         }
@@ -30,7 +30,7 @@ namespace TP3
 
                 string binInstr = Convert.ToString(Convert.ToInt32(hexInstr, 16), 2).PadLeft(32, '0');
                 int opcode = Convert.ToInt32(binInstr[..7], 2);
-                int nextPc = _pc + 4;
+                int nextPc = _pc++;
                 switch (opcode)
                 {
                     case 0:
@@ -54,6 +54,20 @@ namespace TP3
             int rd = Convert.ToInt32(instruction[16..21], 2);
             int shamt = Convert.ToInt32(instruction[21..26], 2);
             int funct = Convert.ToInt32(instruction[26..], 2);
+            AluOp aluOp = funct switch
+            {
+                0b100_000 => AluOp.add,
+                0b100_010 => AluOp.sub,
+                0b100_100 => AluOp.and,
+                0b100_101 => AluOp.or,
+                0b101_010 => AluOp.slt,
+                _ => throw new ArgumentException(
+                    $"The informed funct in instruction opcode {0}, funct {funct} is invalid.")
+            };
+
+            _regs.Start(false, rs, rt, rd, null, out int r1, out int? r2);
+            _alu.Start(aluOp, r1, r2.GetValueOrDefault(), out bool zero, out int result);
+            _regs.Start(true, rs, rt, rd, result, out _, out _);
         }
 
         private void I(string instruction)

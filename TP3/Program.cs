@@ -13,7 +13,8 @@ namespace TP3
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine(Convert.ToString(0x7fff_fffc, 10));
+            Processor proc = new Processor();
+            proc.Start(new List<string> {"0x01095020"});
             return;
             if (args.Length >= 3 && File.Exists(args[1]))
             {

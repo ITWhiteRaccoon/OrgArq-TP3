@@ -9,10 +9,12 @@ namespace TP3.Components
         public Registers()
         {
             _registers = new int[32];
-            _registers[28] = 0x1000_8000;//$gp - global pointer
-            _registers[29] = 0x7fff_fffc;//$sp - stack pointer
+            _registers[28] = 0x1000_8000; //$gp - global pointer
+            _registers[29] = 0x7fff_fffc; //$sp - stack pointer
+            _registers[8] = 2;
+            _registers[9] = 3;
         }
-        
+
         /// <summary>
         /// Reads and/or writes data to the chosen registers.
         /// </summary>
@@ -24,7 +26,7 @@ namespace TP3.Components
         /// <param name="readData1">Outputs the content of the first chosen register</param>
         /// <param name="readData2">Outputs the content of the second chosen register or null</param>
         /// <exception cref="ArgumentOutOfRangeException">If the informed registers are out of the 0-31 range</exception>
-        private void Start(bool write, int readReg1, int? readReg2, int? writeReg, int? writeData,
+        public void Start(bool write, int readReg1, int? readReg2, int? writeReg, int? writeData,
             out int readData1, out int? readData2)
         {
             if (readReg1 < 0 || readReg1 > 31 ||
