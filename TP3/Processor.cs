@@ -61,6 +61,8 @@ namespace TP3
                         I(_binInstr[_pc]);
                         break;
                 }
+
+                Console.WriteLine($"{_binInstr[_pc]}\t control={_control}\t registers={_regs}\t dataMemory={_dataMem}");
             }
         }
 
@@ -75,6 +77,7 @@ namespace TP3
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int imm = Convert.ToInt32(instruction[16..], 2);
             _regs.Start(false, rs, null, rt, null);
+
             //TODO
         }
 
@@ -86,7 +89,7 @@ namespace TP3
 
         private void Lw(string instruction)
         {
-            //TODO
+            //TODO (LW stores the loaded content in rt, not rd)
         }
 
         private void R(string instruction)
@@ -98,6 +101,7 @@ namespace TP3
             int shamt = Convert.ToInt32(instruction[21..26], 2);
             AluOp? aluOp = funct switch
             {
+                0b000_000 => AluOp.Sll,
                 0b100_000 => AluOp.Add,
                 0b100_010 => AluOp.Sub,
                 0b100_100 => AluOp.And,
@@ -107,16 +111,11 @@ namespace TP3
             };
             switch (funct)
             {
-                case 0:
+                case 0: //sll
                 {
-                    _regs.Start(false, rt, null, rd, null);
-                    _regs.Start(true, rt, null, rd, _regs.ReadData1 << shamt);
-                    break;
-                }
-                case 2:
-                {
-                    _regs.Start(false, rt, null, rd, null);
-                    _regs.Start(true, rt, null, rd, _regs.ReadData1 >> shamt);
+                    _regs.Start(false, rt, null, null, null);
+                    _alu.Start(aluOp.Value, _regs.ReadData1, shamt);
+                    _regs.Start(true, rt, null, rd, _alu.AluResult);
                     break;
                 }
                 default:
@@ -127,13 +126,18 @@ namespace TP3
                     break;
                 }
             }
-
-            Console.WriteLine($"{_binInstr[_pc]} registers={_regs} dataMemory={_dataMem}");
         }
 
         private void Sw(string instruction)
         {
             //TODO
+        }
+
+        private int SignExtend(string number)
+        {
+            if (number.Length == 0) { number = "0"; }
+
+            return number.PadLeft(32, number[0]);
         }
     }
 }
