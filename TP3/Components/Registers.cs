@@ -1,33 +1,31 @@
 ﻿using System;
+using System.Linq;
 
 namespace TP3.Components
 {
     public class Registers
     {
         private int[] _registers;
+        public int ReadData1 { get; private set; }
+        public int ReadData2 { get; private set; }
 
         public Registers()
         {
             _registers = new int[32];
             _registers[28] = 0x1000_8000; //$gp - global pointer
             _registers[29] = 0x7fff_fffc; //$sp - stack pointer
-            _registers[8] = 2;
-            _registers[9] = 3;
         }
 
         /// <summary>
         /// Reads and/or writes data to the chosen registers.
         /// </summary>
-        /// <param name="write">If true writes writeData to writeReg </param>
+        /// <param name="write">If true, writes writeData to writeReg </param>
         /// <param name="readReg1">First register number</param>
         /// <param name="readReg2">Second register number or null</param>
         /// <param name="writeReg">Register to be written or null</param>
         /// <param name="writeData">Data to write in writeReg or null</param>
-        /// <param name="readData1">Outputs the content of the first chosen register</param>
-        /// <param name="readData2">Outputs the content of the second chosen register or null</param>
         /// <exception cref="ArgumentOutOfRangeException">If the informed registers are out of the 0-31 range</exception>
-        public void Start(bool write, int readReg1, int? readReg2, int? writeReg, int? writeData,
-            out int readData1, out int? readData2)
+        public void Start(bool write, int readReg1, int? readReg2, int? writeReg, int? writeData)
         {
             if (readReg1 < 0 || readReg1 > 31 ||
                 (readReg2 != null && (readReg2 < 0 || readReg2 > 31)) ||
@@ -41,8 +39,13 @@ namespace TP3.Components
                 _registers[writeReg.Value] = writeData.Value;
             }
 
-            readData1 = _registers[readReg1];
-            readData2 = readReg2 == null ? null : (int?) _registers[readReg2.Value];
+            ReadData1 = _registers[readReg1];
+            if (readReg2 != null) { ReadData2 = _registers[readReg2.Value]; }
+        }
+
+        public override string ToString()
+        {
+            return $"[{string.Join(',', _registers.Select((d, i) => $"{i}=0x{Convert.ToString(d, 16)}"))}]";
         }
     }
 }

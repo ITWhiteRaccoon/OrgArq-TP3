@@ -2,10 +2,11 @@
 {
     public enum AluOp
     {
-        add,
-        sub,
-        and,
-        or,
-        slt
+        Add,
+        And,
+        Or,
+        Sll,
+        Slt,
+        Sub
     }
 }

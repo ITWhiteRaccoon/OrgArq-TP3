@@ -13,16 +13,16 @@ namespace TP3
     {
         private static void Main(string[] args)
         {
-            Processor proc = new Processor();
-            proc.Start(new List<string> {"0x01095020"});
+            Processor proc = new Processor(new List<string> {"0x01095020"});
+            proc.Start();
             return;
             if (args.Length >= 3 && File.Exists(args[1]))
             {
                 if (args[0] == "-s")
                 {
                     List<string> result = AssembleOperation(args[1], "-a");
-                    Processor processor = new Processor();
-                    processor.Start(result);
+                    Processor processor = new Processor(result);
+                    processor.Start();
                 }
                 else
                 {

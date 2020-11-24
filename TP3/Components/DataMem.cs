@@ -6,6 +6,7 @@ namespace TP3.Components
     public class DataMem
     {
         private Dictionary<int, int> _memory;
+        public int ReadData { get; private set; }
 
         public DataMem()
         {
@@ -19,8 +20,7 @@ namespace TP3.Components
         /// <param name="memRead">Indicates the block will write in memory</param>
         /// <param name="address">Memory location to be written or read</param>
         /// <param name="writeData">Data to be written in memory</param>
-        /// <returns>Read data if reading, null if writing.</returns>
-        public int? Start(bool memWrite, bool memRead, int address, int? writeData)
+        public void Start(bool memWrite, bool memRead, int address, int? writeData)
         {
             if (memWrite && !memRead)
             {
@@ -35,10 +35,13 @@ namespace TP3.Components
             else if (memRead && !memWrite)
             {
                 _memory.TryGetValue(address, out int r);
-                return r;
+                ReadData = r;
             }
+        }
 
-            return null;
+        public override string ToString()
+        {
+            return $"[{string.Join(',', _memory)}]";
         }
     }
 }
