@@ -37,7 +37,8 @@ namespace TP3
         {
             while (_pc <= _pcLimit)
             {
-                int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
+                _pc = General(_binInstr[_pc]);
+                /*int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
                 int nextPc = _pc + 4;
                 switch (opcode)
                 {
@@ -61,7 +62,7 @@ namespace TP3
                         break;
                 }
 
-                _pc = nextPc;
+                _pc = nextPc;*/
                 Console.WriteLine($"{_binInstr[_pc]}\t control={_control}\t registers={_regs}\t dataMemory={_dataMem}");
             }
         }
@@ -93,21 +94,22 @@ namespace TP3
             _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
                 _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
             _alu.Start(_control.AluControlInput, _regs.ReadData1, _control.AluSrc ? imm : _regs.ReadData2, shamt);
-            _dataMem.Start(_control.MemWrite,_control.MemRead,_alu.AluResult,_regs.ReadData2);
-            _regs.Start(_control.RegWrite,);
+            _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, _regs.ReadData2);
+            _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
+                _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
 
             return nextPc;
         }
 
         private void I(string instruction)
         {
-            int rs = Convert.ToInt32(instruction[6..11], 2);
+            /*int rs = Convert.ToInt32(instruction[6..11], 2);
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int imm = Convert.ToInt32(instruction[16..], 2);
             _regs.Start(_control.RegWrite, rs, null, rt, null);
             imm = SignExtend(imm);
             _alu.Start(AluControl.Add, _regs.ReadData1, imm);
-            _regs.Start(_control.RegWrite, rs, null, rt, _alu.AluResult);
+            _regs.Start(_control.RegWrite, rs, null, rt, _alu.AluResult);*/
         }
 
         private void J(string instruction)
@@ -121,11 +123,11 @@ namespace TP3
             int rs = Convert.ToInt32(instruction[6..11], 2);
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int imm = Convert.ToInt32(instruction[16..], 2);
-            _regs.Start(_control.RegWrite, rs, null, rt, null);
+            /*_regs.Start(_control.RegWrite, rs, null, rt, null);
             imm = SignExtend(imm);
             _alu.Start(AluControl.Add, _regs.ReadData1, imm);
             _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, null);
-            _regs.Start(_control.RegWrite, rs, null, rt, _dataMem.ReadData);
+            _regs.Start(_control.RegWrite, rs, null, rt, _dataMem.ReadData);*/
         }
 
         private void R(string instruction)
@@ -135,7 +137,7 @@ namespace TP3
             int rd = Convert.ToInt32(instruction[16..21], 2);
             int funct = Convert.ToInt32(instruction[26..], 2);
             int shamt = Convert.ToInt32(instruction[21..26], 2);
-            switch (funct)
+            /*switch (funct)
             {
                 case 0: //sll
                 {
@@ -151,7 +153,7 @@ namespace TP3
                     _regs.Start(_control.RegWrite, rs, rt, rd, _alu.AluResult);
                     break;
                 }
-            }
+            }*/
         }
 
         private void Sw(string instruction)
