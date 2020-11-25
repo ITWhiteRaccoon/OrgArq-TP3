@@ -38,7 +38,6 @@ namespace TP3
             while (_pc <= _pcLimit)
             {
                 int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
-                _control.SetSignals(opcode);
                 int nextPc = _pc + 4;
                 switch (opcode)
                 {
@@ -72,19 +71,32 @@ namespace TP3
             //TODO
         }
 
-        private void General(string instruction)
+        private int General(string instruction)
         {
-            int address = Convert.ToInt32($"{instruction[6..]}00", 2);
+            int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
             int rs = Convert.ToInt32(instruction[6..11], 2);
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int rd = Convert.ToInt32(instruction[16..21], 2);
             int imm = Convert.ToInt32(instruction[16..], 2);
             int funct = Convert.ToInt32(instruction[26..], 2);
             int shamt = Convert.ToInt32(instruction[21..26], 2);
+
+            int pcAdd = _pc + 4;
+            int address = Convert.ToInt32(
+                $"{Convert.ToString(pcAdd, 2).PadLeft(32, '0')[..4]}{instruction[6..]}00", 2);
+            int pcBranch = pcAdd + (imm << 2);
+            int nextPc = _control.Jump ? address :
+                _control.Branch && _alu.Zero ? pcBranch : pcAdd;
+            _control.SetSignals(opcode, funct);
+
             imm = SignExtend(imm);
-            _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rt : rs,
+            _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
                 _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
-            
+            _alu.Start(_control.AluControlInput, _regs.ReadData1, _control.AluSrc ? imm : _regs.ReadData2, shamt);
+            _dataMem.Start(_control.MemWrite,_control.MemRead,_alu.AluResult,_regs.ReadData2);
+            _regs.Start(_control.RegWrite,);
+
+            return nextPc;
         }
 
         private void I(string instruction)
