@@ -1,6 +1,6 @@
 ﻿namespace TP3.Components
 {
-    public enum AluOp
+    public enum AluControl
     {
         Add,
         And,

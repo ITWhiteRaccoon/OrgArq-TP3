@@ -69,8 +69,22 @@ namespace TP3
 
         private void B(string instruction)
         {
-            AluOp aluOp = AluOp.Sub;
             //TODO
+        }
+
+        private void General(string instruction)
+        {
+            int address = Convert.ToInt32($"{instruction[6..]}00", 2);
+            int rs = Convert.ToInt32(instruction[6..11], 2);
+            int rt = Convert.ToInt32(instruction[11..16], 2);
+            int rd = Convert.ToInt32(instruction[16..21], 2);
+            int imm = Convert.ToInt32(instruction[16..], 2);
+            int funct = Convert.ToInt32(instruction[26..], 2);
+            int shamt = Convert.ToInt32(instruction[21..26], 2);
+            imm = SignExtend(imm);
+            _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rt : rs,
+                _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
+            
         }
 
         private void I(string instruction)
@@ -80,8 +94,8 @@ namespace TP3
             int imm = Convert.ToInt32(instruction[16..], 2);
             _regs.Start(_control.RegWrite, rs, null, rt, null);
             imm = SignExtend(imm);
-            _alu.Start(_regs.ReadData1);
-            //TODO
+            _alu.Start(AluControl.Add, _regs.ReadData1, imm);
+            _regs.Start(_control.RegWrite, rs, null, rt, _alu.AluResult);
         }
 
         private void J(string instruction)
@@ -92,7 +106,14 @@ namespace TP3
 
         private void Lw(string instruction)
         {
-            //TODO (LW stores the loaded content in rt, not rd)
+            int rs = Convert.ToInt32(instruction[6..11], 2);
+            int rt = Convert.ToInt32(instruction[11..16], 2);
+            int imm = Convert.ToInt32(instruction[16..], 2);
+            _regs.Start(_control.RegWrite, rs, null, rt, null);
+            imm = SignExtend(imm);
+            _alu.Start(AluControl.Add, _regs.ReadData1, imm);
+            _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, null);
+            _regs.Start(_control.RegWrite, rs, null, rt, _dataMem.ReadData);
         }
 
         private void R(string instruction)
@@ -102,16 +123,6 @@ namespace TP3
             int rd = Convert.ToInt32(instruction[16..21], 2);
             int funct = Convert.ToInt32(instruction[26..], 2);
             int shamt = Convert.ToInt32(instruction[21..26], 2);
-            AluOp? aluOp = funct switch
-            {
-                0b000_000 => AluOp.Sll,
-                0b100_000 => AluOp.Add,
-                0b100_010 => AluOp.Sub,
-                0b100_100 => AluOp.And,
-                0b100_101 => AluOp.Or,
-                0b101_010 => AluOp.Slt,
-                _ => null
-            };
             switch (funct)
             {
                 case 0: //sll

@@ -2,6 +2,7 @@
 {
     public class Control
     {
+        public AluControl AluControlInput { get; private set; }
         public int AluOp { get; private set; }
         public bool AluSrc { get; private set; }
         public bool Branch { get; private set; }
@@ -12,7 +13,7 @@
         public bool RegDst { get; private set; }
         public bool RegWrite { get; private set; }
 
-        public void SetSignals(int opcode)
+        public void SetSignals(int opcode, int funct)
         {
             switch (opcode)
             {
@@ -40,6 +41,7 @@
                     Branch = true;
                     AluOp = 0b01;
                     Jump = false;
+                    AluControlInput = AluControl.Sub;
                     break;
                 case 35: //lw
                     RegDst = false;
@@ -60,6 +62,28 @@
                     Branch = false;
                     AluOp = 0b00;
                     Jump = false;
+                    break;
+            }
+
+            switch (AluOp)
+            {
+                case 0b00:
+                    AluControlInput = AluControl.Add;
+                    break;
+                case 0b01:
+                    AluControlInput = AluControl.Sub;
+                    break;
+                case 0b10:
+                    AluControlInput = funct switch
+                    {
+                        0b000_000 => AluControl.Sll,
+                        0b100_000 => AluControl.Add,
+                        0b100_010 => AluControl.Sub,
+                        0b100_100 => AluControl.And,
+                        0b100_101 => AluControl.Or,
+                        0b101_010 => AluControl.Slt,
+                        _ => AluControlInput
+                    };
                     break;
             }
         }

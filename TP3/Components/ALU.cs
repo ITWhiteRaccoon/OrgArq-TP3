@@ -10,19 +10,19 @@ namespace TP3.Components
         /// <summary>
         /// Performs the informed ALU operation.
         /// </summary>
-        /// <param name="aluOp">The ALU operation</param>
+        /// <param name="aluControl">The ALU operation</param>
         /// <param name="alu1">First ALU operand</param>
         /// <param name="alu2">Second ALU operand</param>
-        public void Start(AluOp aluOp, int alu1, int alu2)
+        public void Start(AluControl aluControl, int alu1, int alu2)
         {
-            AluResult = aluOp switch
+            AluResult = aluControl switch
             {
-                AluOp.Add => alu1 + alu2,
-                AluOp.And => alu1 & alu2,
-                AluOp.Or => alu1 | alu2,
-                AluOp.Sll => alu1 << alu2,
-                AluOp.Slt => alu1 < alu2 ? 1 : 0,
-                AluOp.Sub => alu1 - alu2,
+                AluControl.Add => alu1 + alu2,
+                AluControl.And => alu1 & alu2,
+                AluControl.Or => alu1 | alu2,
+                AluControl.Sll => alu1 << alu2,
+                AluControl.Slt => alu1 < alu2 ? 1 : 0,
+                AluControl.Sub => alu1 - alu2,
                 _ => throw new InvalidEnumArgumentException()
             };
 
