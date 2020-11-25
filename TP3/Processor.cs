@@ -38,12 +38,12 @@ namespace TP3
             while (_pc <= _pcLimit)
             {
                 int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
+                _control.SetSignals(opcode);
                 int nextPc = _pc + 4;
                 switch (opcode)
                 {
                     case 0: //R
                         R(_binInstr[_pc]);
-                        _pc = nextPc;
                         break;
                     case 2: //j
                         J(_binInstr[_pc]);
@@ -62,12 +62,14 @@ namespace TP3
                         break;
                 }
 
+                _pc = nextPc;
                 Console.WriteLine($"{_binInstr[_pc]}\t control={_control}\t registers={_regs}\t dataMemory={_dataMem}");
             }
         }
 
         private void B(string instruction)
         {
+            AluOp aluOp = AluOp.Sub;
             //TODO
         }
 
@@ -76,8 +78,9 @@ namespace TP3
             int rs = Convert.ToInt32(instruction[6..11], 2);
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int imm = Convert.ToInt32(instruction[16..], 2);
-            _regs.Start(false, rs, null, rt, null);
-
+            _regs.Start(_control.RegWrite, rs, null, rt, null);
+            imm = SignExtend(imm);
+            _alu.Start(_regs.ReadData1);
             //TODO
         }
 
@@ -113,16 +116,16 @@ namespace TP3
             {
                 case 0: //sll
                 {
-                    _regs.Start(false, rt, null, null, null);
+                    _regs.Start(_control.RegWrite, rt, null, null, null);
                     _alu.Start(aluOp.Value, _regs.ReadData1, shamt);
-                    _regs.Start(true, rt, null, rd, _alu.AluResult);
+                    _regs.Start(_control.RegWrite, rt, null, rd, _alu.AluResult);
                     break;
                 }
                 default:
                 {
-                    _regs.Start(false, rs, rt, rd, null);
+                    _regs.Start(_control.RegWrite, rs, rt, null, null);
                     _alu.Start(aluOp.Value, _regs.ReadData1, _regs.ReadData2);
-                    _regs.Start(true, rs, rt, rd, _alu.AluResult);
+                    _regs.Start(_control.RegWrite, rs, rt, rd, _alu.AluResult);
                     break;
                 }
             }
@@ -133,11 +136,11 @@ namespace TP3
             //TODO
         }
 
-        private int SignExtend(string number)
+        private static int SignExtend(int number)
         {
-            if (number.Length == 0) { number = "0"; }
-
-            return number.PadLeft(32, number[0]);
+            string num = Convert.ToString(number, 2);
+            num = num.PadLeft(32, num[0]);
+            return Convert.ToInt32(num, 2);
         }
     }
 }

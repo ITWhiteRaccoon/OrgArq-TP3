@@ -13,7 +13,7 @@ namespace TP3
     {
         private static void Main(string[] args)
         {
-            Processor proc = new Processor(new List<string> {"0x01095020"});
+            Processor proc = new Processor(new List<string> {"0x34080002", "0x34090003", "0x01095021"});
             proc.Start();
             return;
             if (args.Length >= 3 && File.Exists(args[1]))
