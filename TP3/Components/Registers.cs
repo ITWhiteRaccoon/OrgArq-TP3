@@ -34,13 +34,13 @@ namespace TP3.Components
                 throw new ArgumentOutOfRangeException($"The informed registers must be between 0 and 31");
             }
 
+            ReadData1 = _registers[readReg1];
+            if (readReg2 != null) { ReadData2 = _registers[readReg2.Value]; }
+
             if (write && writeReg != null && writeData != null)
             {
                 _registers[writeReg.Value] = writeData.Value;
             }
-
-            ReadData1 = _registers[readReg1];
-            if (readReg2 != null) { ReadData2 = _registers[readReg2.Value]; }
         }
 
         public override string ToString()
