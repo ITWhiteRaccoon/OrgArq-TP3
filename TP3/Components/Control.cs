@@ -2,7 +2,7 @@
 {
     public class Control
     {
-        public AluControl AluControlInput { get; private set; }
+        public ALU.Operation AluControlInput { get; private set; }
         public int AluOp { get; private set; }
         public bool AluSrc { get; private set; }
         public bool Branch { get; private set; }
@@ -41,7 +41,6 @@
                     Branch = true;
                     AluOp = 0b01;
                     Jump = false;
-                    AluControlInput = AluControl.Sub;
                     break;
                 case 35: //lw
                     RegDst = false;
@@ -68,20 +67,20 @@
             switch (AluOp)
             {
                 case 0b00:
-                    AluControlInput = AluControl.Add;
+                    AluControlInput = ALU.Operation.Add;
                     break;
                 case 0b01:
-                    AluControlInput = AluControl.Sub;
+                    AluControlInput = ALU.Operation.Sub;
                     break;
                 case 0b10:
                     AluControlInput = funct switch
                     {
-                        0b000_000 => AluControl.Sll,
-                        0b100_000 => AluControl.Add,
-                        0b100_010 => AluControl.Sub,
-                        0b100_100 => AluControl.And,
-                        0b100_101 => AluControl.Or,
-                        0b101_010 => AluControl.Slt,
+                        0b000_000 => ALU.Operation.Sll,
+                        0b100_000 => ALU.Operation.Add,
+                        0b100_010 => ALU.Operation.Sub,
+                        0b100_100 => ALU.Operation.And,
+                        0b100_101 => ALU.Operation.Or,
+                        0b101_010 => ALU.Operation.Slt,
                         _ => AluControlInput
                     };
                     break;
