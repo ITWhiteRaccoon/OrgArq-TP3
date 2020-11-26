@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace TP3.Components
 {
@@ -35,7 +36,7 @@ namespace TP3.Components
 
         public override string ToString()
         {
-            return $"[{string.Join(", ", _memory)}]";
+            return $"[{string.Join(", ", _memory.Select(x => $"0x{x.Key:x}=0x{x.Value:x}"))}]";
         }
     }
 }
