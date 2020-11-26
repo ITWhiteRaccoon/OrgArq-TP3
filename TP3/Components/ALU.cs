@@ -8,6 +8,7 @@ namespace TP3.Components
         {
             Add,
             And,
+            Lui,
             Or,
             Sll,
             Slt,
@@ -30,6 +31,7 @@ namespace TP3.Components
             {
                 Operation.Add => alu1 + alu2,
                 Operation.And => alu1 & alu2,
+                Operation.Lui => alu1 << 16,
                 Operation.Or => alu1 | alu2,
                 Operation.Sll => alu1 << shamt,
                 Operation.Slt => alu1 < alu2 ? 1 : 0,
