@@ -59,14 +59,17 @@ namespace TP3
                 _control.SetSignals(opcode, funct);
 
                 //Start register-ALU-memory-register sending all the control signals
-                _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
-                    _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
+                _regs.Start(false, rs, rt, null, null);
                 _alu.Start(_control.AluControlInput, _regs.ReadData1, _control.AluSrc ? imm : _regs.ReadData2, shamt);
                 _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, _regs.ReadData2);
                 _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
                     _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
 
-                Console.WriteLine($"{_binInstr[_pc]}\t control={_control}\t registers={_regs}\t dataMemory={_dataMem}");
+                Console.WriteLine($"\t{_binInstr[_pc]} pc=0x{_pc:x} opcode=0x{opcode:x} rs=0x{rs:x} rt=0x{rt:x} " +
+                                  $"rd=0x{rd:x} imm=0x{imm:x} shamt=0x{shamt:x} funct=0x{funct:x}\n" +
+                                  $"\tcontrol=\t{_control}\n" +
+                                  $"\tregisters=\t{_regs}\n" +
+                                  $"\tdataMemory=\t{_dataMem}\n");
                 _pc = nextPc;
             }
         }
