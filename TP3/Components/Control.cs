@@ -18,73 +18,103 @@
             switch (opcode)
             {
                 case 0: //R
-                    RegDst = true;
+                    AluOp = 0b010;
                     AluSrc = false;
-                    MemToReg = false;
-                    RegWrite = true;
-                    MemRead = false;
-                    MemWrite = false;
                     Branch = false;
-                    AluOp = 0b10;
                     Jump = false;
+                    MemRead = false;
+                    MemToReg = false;
+                    MemWrite = false;
+                    RegDst = true;
+                    RegWrite = true;
                     break;
                 case 2: //j
-                    RegWrite = false;
-                    MemWrite = false;
                     Jump = true;
+                    MemWrite = false;
+                    RegWrite = false;
                     break;
                 case 4: //beq
+                    AluOp = 0b001;
                     AluSrc = false;
-                    RegWrite = false;
+                    Branch = true;
+                    Jump = false;
                     MemRead = false;
                     MemWrite = false;
-                    Branch = true;
-                    AluOp = 0b01;
+                    RegWrite = false;
+                    break;
+                case 13: //ori
+                    AluOp = 0b100;
+                    AluSrc = true;
+                    Branch = false;
                     Jump = false;
+                    MemRead = false;
+                    MemToReg = false;
+                    MemWrite = false;
+                    RegDst = false;
+                    RegWrite = true;
+                    break;
+                case 15: //lui
+                    AluOp = 0b011;
+                    AluSrc = true;
+                    Branch = false;
+                    Jump = false;
+                    MemRead = false;
+                    MemToReg = false;
+                    MemWrite = false;
+                    RegDst = false;
+                    RegWrite = true;
                     break;
                 case 35: //lw
-                    RegDst = false;
+                    AluOp = 0b000;
                     AluSrc = true;
-                    MemToReg = true;
-                    RegWrite = true;
-                    MemRead = true;
-                    MemWrite = false;
                     Branch = false;
-                    AluOp = 0b00;
                     Jump = false;
+                    MemRead = true;
+                    MemToReg = true;
+                    MemWrite = false;
+                    RegDst = false;
+                    RegWrite = true;
                     break;
                 case 43: //sw
+                    AluOp = 0b000;
                     AluSrc = false;
-                    RegWrite = false;
+                    Branch = false;
+                    Jump = false;
                     MemRead = false;
                     MemWrite = true;
-                    Branch = false;
-                    AluOp = 0b00;
-                    Jump = false;
+                    RegWrite = false;
                     break;
             }
 
-            switch (AluOp)
+            AluControlInput = AluOp switch
             {
-                case 0b00:
-                    AluControlInput = ALU.Operation.Add;
-                    break;
-                case 0b01:
-                    AluControlInput = ALU.Operation.Sub;
-                    break;
-                case 0b10:
-                    AluControlInput = funct switch
+                0b000 => //lw, sw
+                    ALU.Operation.Add,
+                0b001 => //beq
+                    ALU.Operation.Sub,
+                0b010 => //R-type
+                    funct switch
                     {
-                        0b000_000 => ALU.Operation.Sll,
-                        0b100_000 => ALU.Operation.Add,
-                        0b100_010 => ALU.Operation.Sub,
-                        0b100_100 => ALU.Operation.And,
-                        0b100_101 => ALU.Operation.Or,
-                        0b101_010 => ALU.Operation.Slt,
+                        0b000_000 => //sll
+                            ALU.Operation.Sll,
+                        0b100_001 => //addu
+                            ALU.Operation.Add,
+                        0b100_010 => //sub
+                            ALU.Operation.Sub,
+                        0b100_100 => //and
+                            ALU.Operation.And,
+                        0b100_101 => //or
+                            ALU.Operation.Or,
+                        0b101_010 => //slt
+                            ALU.Operation.Slt,
                         _ => AluControlInput
-                    };
-                    break;
-            }
+                    },
+                0b011 => //lui
+                    ALU.Operation.Lui,
+                0b100 => //ori
+                    ALU.Operation.Or,
+                _ => AluControlInput
+            };
         }
 
         public override string ToString()

@@ -38,43 +38,13 @@ namespace TP3
             while (_pc <= _pcLimit)
             {
                 _pc = General(_binInstr[_pc]);
-                /*int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
-                int nextPc = _pc + 4;
-                switch (opcode)
-                {
-                    case 0: //R
-                        R(_binInstr[_pc]);
-                        break;
-                    case 2: //j
-                        J(_binInstr[_pc]);
-                        break;
-                    case 4: //beq
-                        B(_binInstr[_pc]);
-                        break;
-                    case 35: //lw
-                        Lw(_binInstr[_pc]);
-                        break;
-                    case 43: //sw
-                        Sw(_binInstr[_pc]);
-                        break;
-                    default:
-                        I(_binInstr[_pc]);
-                        break;
-                }
-
-                _pc = nextPc;*/
                 Console.WriteLine($"{_binInstr[_pc]}\t control={_control}\t registers={_regs}\t dataMemory={_dataMem}");
             }
         }
 
-        private void B(string instruction)
-        {
-            //TODO
-        }
-
         private int General(string instruction)
         {
-            int opcode = Convert.ToInt32(_binInstr[_pc][..6], 2);
+            int opcode = Convert.ToInt32(instruction[..6], 2);
             int rs = Convert.ToInt32(instruction[6..11], 2);
             int rt = Convert.ToInt32(instruction[11..16], 2);
             int rd = Convert.ToInt32(instruction[16..21], 2);
@@ -99,66 +69,6 @@ namespace TP3
                 _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
 
             return nextPc;
-        }
-
-        private void I(string instruction)
-        {
-            /*int rs = Convert.ToInt32(instruction[6..11], 2);
-            int rt = Convert.ToInt32(instruction[11..16], 2);
-            int imm = Convert.ToInt32(instruction[16..], 2);
-            _regs.Start(_control.RegWrite, rs, null, rt, null);
-            imm = SignExtend(imm);
-            _alu.Start(AluControl.Add, _regs.ReadData1, imm);
-            _regs.Start(_control.RegWrite, rs, null, rt, _alu.AluResult);*/
-        }
-
-        private void J(string instruction)
-        {
-            int address = Convert.ToInt32($"{instruction[6..]}00", 2);
-            //TODO
-        }
-
-        private void Lw(string instruction)
-        {
-            int rs = Convert.ToInt32(instruction[6..11], 2);
-            int rt = Convert.ToInt32(instruction[11..16], 2);
-            int imm = Convert.ToInt32(instruction[16..], 2);
-            /*_regs.Start(_control.RegWrite, rs, null, rt, null);
-            imm = SignExtend(imm);
-            _alu.Start(AluControl.Add, _regs.ReadData1, imm);
-            _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, null);
-            _regs.Start(_control.RegWrite, rs, null, rt, _dataMem.ReadData);*/
-        }
-
-        private void R(string instruction)
-        {
-            int rs = Convert.ToInt32(instruction[6..11], 2);
-            int rt = Convert.ToInt32(instruction[11..16], 2);
-            int rd = Convert.ToInt32(instruction[16..21], 2);
-            int funct = Convert.ToInt32(instruction[26..], 2);
-            int shamt = Convert.ToInt32(instruction[21..26], 2);
-            /*switch (funct)
-            {
-                case 0: //sll
-                {
-                    _regs.Start(_control.RegWrite, rt, null, null, null);
-                    _alu.Start(aluOp.Value, _regs.ReadData1, shamt);
-                    _regs.Start(_control.RegWrite, rt, null, rd, _alu.AluResult);
-                    break;
-                }
-                default:
-                {
-                    _regs.Start(_control.RegWrite, rs, rt, null, null);
-                    _alu.Start(aluOp.Value, _regs.ReadData1, _regs.ReadData2);
-                    _regs.Start(_control.RegWrite, rs, rt, rd, _alu.AluResult);
-                    break;
-                }
-            }*/
-        }
-
-        private void Sw(string instruction)
-        {
-            //TODO
         }
 
         private static int SignExtend(int number)
