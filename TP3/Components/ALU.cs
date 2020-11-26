@@ -2,7 +2,7 @@
 
 namespace TP3.Components
 {
-    public class ALU
+    public class Alu
     {
         public enum Operation
         {
