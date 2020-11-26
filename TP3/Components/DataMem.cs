@@ -35,7 +35,7 @@ namespace TP3.Components
 
         public override string ToString()
         {
-            return $"[{string.Join(',', _memory)}]";
+            return $"[{string.Join(", ", _memory)}]";
         }
     }
 }
