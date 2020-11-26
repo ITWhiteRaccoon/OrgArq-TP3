@@ -31,9 +31,9 @@ namespace TP3.Components
             {
                 Operation.Add => alu1 + alu2,
                 Operation.And => alu1 & alu2,
-                Operation.Lui => alu1 << 16,
+                Operation.Lui => alu2 << 16,
                 Operation.Or => alu1 | alu2,
-                Operation.Sll => alu1 << shamt,
+                Operation.Sll => alu2 << shamt,
                 Operation.Slt => alu1 < alu2 ? 1 : 0,
                 Operation.Sub => alu1 - alu2,
                 _ => throw new InvalidEnumArgumentException()
