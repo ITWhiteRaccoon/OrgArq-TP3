@@ -23,10 +23,10 @@ namespace TP3.Components
         /// <param name="write">If true, writes writeData to writeReg </param>
         /// <param name="readReg1">First register number</param>
         /// <param name="readReg2">Second register number</param>
-        /// <param name="writeReg">Register to be written</param>
-        /// <param name="writeData">Data to write in writeReg</param>
+        /// <param name="writeReg">Register to be written or null</param>
+        /// <param name="writeData">Data to write in writeReg or null</param>
         /// <exception cref="IndexOutOfRangeException">If the informed registers are out of the 0-31 range</exception>
-        public void Start(bool write, int readReg1, int readReg2, int writeReg, int writeData)
+        public void Start(bool write, int readReg1, int readReg2, int? writeReg, int? writeData)
         {
             if (readReg1 < 0 || readReg1 > 31 ||
                 readReg2 < 0 || readReg2 > 31 ||
@@ -39,15 +39,15 @@ namespace TP3.Components
             ReadData2 = _registers[readReg2];
 
 
-            if (write)
+            if (write && writeReg != null && writeData != null)
             {
-                _registers[writeReg] = writeData;
+                _registers[writeReg.Value] = writeData.Value;
             }
         }
 
         public override string ToString()
         {
-            return $"[{string.Join(',', _registers.Select((d, i) => $"{i}=0x{Convert.ToString(d, 16)}"))}]";
+            return $"[{string.Join(", ", _registers.Select((d, i) => $"{i}=0x{d:x}"))}]";
         }
     }
 }
