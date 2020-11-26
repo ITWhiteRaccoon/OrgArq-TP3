@@ -6,7 +6,7 @@ namespace TP3
 {
     public class Processor
     {
-        private readonly ALU _alu;
+        private readonly Alu _alu;
         private readonly Dictionary<int, string> _binInstr;
         private readonly Control _control;
         private readonly DataMem _dataMem;
@@ -16,7 +16,7 @@ namespace TP3
 
         public Processor(List<string> instructions)
         {
-            _alu = new ALU();
+            _alu = new Alu();
             _binInstr = new Dictionary<int, string>();
             _control = new Control();
             _dataMem = new DataMem();
@@ -47,14 +47,6 @@ namespace TP3
                 int funct = Convert.ToInt32(instruction[26..], 2);
                 int shamt = Convert.ToInt32(instruction[21..26], 2);
 
-                //Calculating all the PC signal alternatives
-                int pcAdd = _pc + 4;
-                int address = Convert.ToInt32(
-                    $"{Convert.ToString(pcAdd, 2).PadLeft(32, '0')[..4]}{instruction[6..]}00", 2);
-                int pcBranch = pcAdd + (imm << 2);
-                int nextPc = _control.Jump ? address :
-                    _control.Branch && _alu.Zero ? pcBranch : pcAdd;
-
                 //Set controller signals
                 _control.SetSignals(opcode, funct);
 
@@ -64,6 +56,14 @@ namespace TP3
                 _dataMem.Start(_control.MemWrite, _control.MemRead, _alu.AluResult, _regs.ReadData2);
                 _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
                     _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
+
+                //Calculating all the PC signal alternatives
+                int pcAdd = _pc + 4;
+                int address = Convert.ToInt32(
+                    $"{Convert.ToString(pcAdd, 2).PadLeft(32, '0')[..4]}{instruction[6..]}00", 2);
+                int pcBranch = pcAdd + (imm << 2);
+                int nextPc = _control.Jump ? address :
+                    _control.Branch && _alu.Zero ? pcBranch : pcAdd;
 
                 Console.WriteLine($"\t{_binInstr[_pc]} pc=0x{_pc:x} opcode=0x{opcode:x} rs=0x{rs:x} rt=0x{rt:x} " +
                                   $"rd=0x{rd:x} imm=0x{imm:x} shamt=0x{shamt:x} funct=0x{funct:x}\n" +
