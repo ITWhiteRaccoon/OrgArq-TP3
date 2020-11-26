@@ -14,7 +14,7 @@ namespace TP3
         private static void Main(string[] args)
         {
             Processor proc = new Processor(new List<string> {"0x34080002", "0x34090003", "0x01095021"});
-            proc.Start();
+            proc.Simulate();
             return;
             if (args.Length >= 3 && File.Exists(args[1]))
             {
@@ -22,7 +22,7 @@ namespace TP3
                 {
                     List<string> result = AssembleOperation(args[1], "-a");
                     Processor processor = new Processor(result);
-                    processor.Start();
+                    processor.Simulate();
                 }
                 else
                 {

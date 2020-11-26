@@ -3,7 +3,7 @@
     public class Control
     {
         public ALU.Operation AluControlInput { get; private set; }
-        public int AluOp { get; private set; }
+        private int AluOp { get; set; }
         public bool AluSrc { get; private set; }
         public bool Branch { get; private set; }
         public bool Jump { get; private set; }

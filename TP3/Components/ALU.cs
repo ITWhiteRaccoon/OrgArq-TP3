@@ -19,7 +19,7 @@ namespace TP3.Components
         public bool Zero { get; private set; }
 
         /// <summary>
-        /// Performs the informed ALU operation.
+        ///     Performs the informed ALU operation.
         /// </summary>
         /// <param name="aluControl">The ALU operation</param>
         /// <param name="alu1">First ALU operand</param>
