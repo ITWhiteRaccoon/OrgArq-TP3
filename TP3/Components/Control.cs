@@ -2,7 +2,7 @@
 {
     public class Control
     {
-        public ALU.Operation AluControlInput { get; private set; }
+        public Alu.Operation AluControlInput { get; private set; }
         private int AluOp { get; set; }
         public bool AluSrc { get; private set; }
         public bool Branch { get; private set; }
@@ -89,30 +89,30 @@
             AluControlInput = AluOp switch
             {
                 0b000 => //lw, sw
-                    ALU.Operation.Add,
+                    Alu.Operation.Add,
                 0b001 => //beq
-                    ALU.Operation.Sub,
+                    Alu.Operation.Sub,
                 0b010 => //R-type
                     funct switch
                     {
                         0b000_000 => //sll
-                            ALU.Operation.Sll,
+                            Alu.Operation.Sll,
                         0b100_001 => //addu
-                            ALU.Operation.Add,
+                            Alu.Operation.Add,
                         0b100_010 => //sub
-                            ALU.Operation.Sub,
+                            Alu.Operation.Sub,
                         0b100_100 => //and
-                            ALU.Operation.And,
+                            Alu.Operation.And,
                         0b100_101 => //or
-                            ALU.Operation.Or,
+                            Alu.Operation.Or,
                         0b101_010 => //slt
-                            ALU.Operation.Slt,
+                            Alu.Operation.Slt,
                         _ => AluControlInput
                     },
                 0b011 => //lui
-                    ALU.Operation.Lui,
+                    Alu.Operation.Lui,
                 0b100 => //ori
-                    ALU.Operation.Or,
+                    Alu.Operation.Or,
                 _ => AluControlInput
             };
         }
