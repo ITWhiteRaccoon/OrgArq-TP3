@@ -1,3 +1,4 @@
+	.text
 main:
 ori $8, $0, 2
 ori $9, $0, 3
@@ -13,5 +14,7 @@ and $15, $8, $9
 sll $16, $15, 2
 jump:beq $0, $16, teste
 
-.data
-.asciiz "Testando"
+    .data
+a:  .word 2
+b:  .word 3
+c:  .word 0
