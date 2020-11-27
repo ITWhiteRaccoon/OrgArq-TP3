@@ -522,7 +522,7 @@ namespace TP3
             instrLabels = new Dictionary<string, int>();
             dataLabels = new Dictionary<int, int>();
 
-            input = input.Where(x => !string.IsNullOrWhiteSpace(x) && Regex.IsMatch(x, @"^\s*(\.(text|data))|\w*"))
+            input = input.Where(x => !string.IsNullOrWhiteSpace(x) && Regex.IsMatch(x, @"^\s*((\.data)|\w+)"))
                 .ToArray();
 
             bool isInstr = true;
@@ -534,15 +534,10 @@ namespace TP3
                 input[i] = input[i].Trim();
 
                 //If .data is found, switch label saving and address to data memory
-                Match categorySearch = Regex.Match(input[i], @"^\s*\.(text|data)");
+                Match categorySearch = Regex.Match(input[i], @"^\s*\.data");
                 if (categorySearch.Success)
                 {
-                    isInstr = categorySearch.Groups[1].Value switch
-                    {
-                        "text" => true,
-                        "data" => false,
-                        _ => isInstr
-                    };
+                    isInstr = false;
                 }
 
 

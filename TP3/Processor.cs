@@ -62,6 +62,12 @@ namespace TP3
                 //Set controller signals
                 _control.SetSignals(opcode, funct);
 
+                //Calculating all the PC signal alternatives
+                int pcAdd = _pc + 4;
+                int address = Convert.ToInt32(
+                    $"{Convert.ToString(pcAdd, 2).PadLeft(32, '0')[..4]}{instruction[6..]}00", 2);
+                int pcBranch = pcAdd + (imm << 2);
+
                 //Start register-ALU-memory-register sending all the control signals
                 _regs.Start(false, rs, rt, null, null);
                 _alu.Start(_control.AluControlInput, _regs.ReadData1, _control.AluSrc ? imm : _regs.ReadData2, shamt);
@@ -69,20 +75,14 @@ namespace TP3
                 _regs.Start(_control.RegWrite, rs, rt, _control.RegDst ? rd : rt,
                     _control.MemToReg ? _dataMem.ReadData : _alu.AluResult);
 
-                //Calculating all the PC signal alternatives
-                int pcAdd = _pc + 4;
-                int address = Convert.ToInt32(
-                    $"{Convert.ToString(pcAdd, 2).PadLeft(32, '0')[..4]}{instruction[6..]}00", 2);
-                int pcBranch = pcAdd + (imm << 2);
-                int nextPc = _control.Jump ? address :
-                    _control.Branch && _alu.Zero ? pcBranch : pcAdd;
-
                 Console.WriteLine($"\t{_binInstr[_pc]} pc=0x{_pc:x} opcode=0x{opcode:x} rs=0x{rs:x} rt=0x{rt:x} " +
                                   $"rd=0x{rd:x} imm=0x{imm:x} shamt=0x{shamt:x} funct=0x{funct:x}\n" +
                                   $"\tcontrol=\t{_control}\n" +
                                   $"\tregisters=\t{_regs}\n" +
                                   $"\tdataMemory=\t{_dataMem}\n");
-                _pc = nextPc;
+
+                _pc = _control.Jump ? address :
+                    _control.Branch && _alu.Zero ? pcBranch : pcAdd;
             }
         }
 
