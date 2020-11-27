@@ -1,12 +1,14 @@
 	.text
 main:
-ori $8, $0, 2
-ori $9, $0, 3
+lui $20, 0x1001
+ori $8, $20, 0
+ori $9, $20, 4
+lw $8, 0($8)
+lw $9, 0($9)
 addu $10, $8, $9
-lui $11, 129 #0b1000 0001
-lui $12, 0x1001 #0x1001 0000 (primeiro endereco de memoria
-sw $10, 0($12) #guardar 5 na memoria
-lw $13, 0($12) #ler 5
+ori $20, $20, 8
+sw $10, 0($20) #guardar 5 na memoria
+lw $13, 0($20) #ler 5
 j jump
 teste:slt $14, $8, $9
 slt $14, $9, $8
