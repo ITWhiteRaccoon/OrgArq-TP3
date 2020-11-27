@@ -1,5 +1,10 @@
 ﻿namespace TP3.Components
 {
+    /// <summary>
+    ///     Eduardo C. Andrade - 17111012-5
+    ///     Michael L. S. Rosa - 17204042-0
+    ///     Org. Arq. I - 2020/2 - TP3
+    /// </summary>
     public class Control
     {
         public Alu.Operation AluControlInput { get; private set; }
@@ -77,7 +82,7 @@
                     break;
                 case 43: //sw
                     AluOp = 0b000;
-                    AluSrc = false;
+                    AluSrc = true;
                     Branch = false;
                     Jump = false;
                     MemRead = false;

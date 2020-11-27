@@ -17,13 +17,13 @@ namespace TP3
             {
                 if (args[0] == "-s")
                 {
-                    List<string> result = AssembleOperation(args[1], "-a");
-                    Processor processor = new Processor(result);
+                    List<string> result = AssembleOperation(args[1], "-a", out Dictionary<int, int> dataLabels);
+                    Processor processor = new Processor(result, dataLabels);
                     processor.Simulate();
                 }
                 else
                 {
-                    List<string> result = AssembleOperation(args[1], args[0]);
+                    List<string> result = AssembleOperation(args[1], args[0], out _);
                     File.WriteAllLines(args[2], result);
                 }
 
@@ -35,17 +35,19 @@ namespace TP3
                 "Informe pela linha de comando a operação desejada e os caminhos de entrada e saída. (eg.: Program -a example.asm example.txt)");
         }
 
-        private static List<string> AssembleOperation(string file, string operation)
+        private static List<string> AssembleOperation(string file, string operation,
+            out Dictionary<int, int> dataLabels)
         {
+            dataLabels = new Dictionary<int, int>();
+
             var result = new List<string>();
             string[] input = File.ReadAllLines(file);
             result = operation switch
             {
-                "-a" => Assembler.Assemble(input),
+                "-a" => Assembler.Assemble(input, out dataLabels),
                 "-d" => Assembler.Disassemble(input),
                 _ => result
             };
-
             return result;
         }
     }

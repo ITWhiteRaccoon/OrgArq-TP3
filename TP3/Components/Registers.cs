@@ -3,6 +3,11 @@ using System.Linq;
 
 namespace TP3.Components
 {
+    /// <summary>
+    ///     Eduardo C. Andrade - 17111012-5
+    ///     Michael L. S. Rosa - 17204042-0
+    ///     Org. Arq. I - 2020/2 - TP3
+    /// </summary>
     public class Registers
     {
         private readonly int[] _registers;

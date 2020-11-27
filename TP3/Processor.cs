@@ -4,6 +4,11 @@ using TP3.Components;
 
 namespace TP3
 {
+    /// <summary>
+    ///     Eduardo C. Andrade - 17111012-5
+    ///     Michael L. S. Rosa - 17204042-0
+    ///     Org. Arq. I - 2020/2 - TP3
+    /// </summary>
     public class Processor
     {
         private readonly Alu _alu;
@@ -14,18 +19,25 @@ namespace TP3
         private readonly Registers _regs;
         private int _pc;
 
-        public Processor(List<string> instructions)
+        public Processor(List<string> instructions, Dictionary<int, int> dataLabels)
         {
+            _pc = 0x400_000;
+            _pcLimit = _pc + (instructions.Count - 1) * 4;
+
             _alu = new Alu();
             _binInstr = new Dictionary<int, string>();
             _control = new Control();
             _dataMem = new DataMem();
-            _pc = 0x400_000;
-            _pcLimit = _pc + (instructions.Count - 1) * 4;
             _regs = new Registers();
+
             for (int i = 0; i < instructions.Count; i++)
             {
                 _binInstr[_pc + i * 4] = Convert.ToString(Convert.ToInt32(instructions[i], 16), 2).PadLeft(32, '0');
+            }
+
+            foreach (KeyValuePair<int, int> dataVar in dataLabels)
+            {
+                _dataMem.Start(true, false, dataVar.Key, dataVar.Value);
             }
         }
 

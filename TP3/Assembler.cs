@@ -14,7 +14,8 @@ namespace TP3
     /// </summary>
     public static class Assembler
     {
-        private const int StartAddress = 0x00400000;
+        private const int StartInstrAddress = 0x00400000;
+        private const int StartMemoryAddress = 0x10010000;
 
         #region Mappings
 
@@ -201,25 +202,25 @@ namespace TP3
                 {
                     mips.Append("j");
                     int address = Convert.ToInt32($"{input[index][6..]}00", 2);
-                    if (!labels.ContainsKey((address - StartAddress) / 4))
+                    if (!labels.ContainsKey((address - StartInstrAddress) / 4))
                     {
-                        labels[(address - StartAddress) / 4] = $"{labelPre}{labelCount}";
+                        labels[(address - StartInstrAddress) / 4] = $"{labelPre}{labelCount}";
                         labelCount++;
                     }
 
-                    mips.Append($" {labels[(address - StartAddress) / 4]}");
+                    mips.Append($" {labels[(address - StartInstrAddress) / 4]}");
                 }
                 else if (opcode == 3) //jal
                 {
                     mips.Append("jal");
                     int address = Convert.ToInt32($"{input[index][6..]}00", 2);
-                    if (!labels.ContainsKey((address - StartAddress) / 4))
+                    if (!labels.ContainsKey((address - StartInstrAddress) / 4))
                     {
-                        labels[(address - StartAddress) / 4] = $"{labelPre}{labelCount}";
+                        labels[(address - StartInstrAddress) / 4] = $"{labelPre}{labelCount}";
                         labelCount++;
                     }
 
-                    mips.Append($" {labels[(address - StartAddress) / 4]}");
+                    mips.Append($" {labels[(address - StartInstrAddress) / 4]}");
                 }
                 else
                 {
@@ -357,14 +358,15 @@ namespace TP3
         ///     Assembles a MIPS code into hex.
         /// </summary>
         /// <param name="input">Array with the lines of code</param>
+        /// <param name="dataLabels">A dictionary containing all .data labels with its values and assigned addresses</param>
         /// <returns>Array with the lines of hex representing the input code.</returns>
-        public static List<string> Assemble(string[] input)
+        public static List<string> Assemble(string[] input, out Dictionary<int, int> dataLabels)
         {
             //Procura por labels primeiro para poder completar (ex.: jal label)
-            input = LabelsToDict(input, out Dictionary<string, int> labels);
+            input = LabelsToDict(input, out Dictionary<string, int> instrLabels, out dataLabels);
 
             //Procura pelos comandos assembly para converter
-            return InstrToHex(input, labels);
+            return InstrToHex(input, instrLabels);
         }
 
         /// <summary>
@@ -455,13 +457,13 @@ namespace TP3
                                 CheckKeys(RegToNum, content[1..3], "registrador", input[index]);
                                 rs = RegToNum[content[1]];
                                 rt = RegToNum[content[2]];
-                                imm = (labels[content[3]] - (StartAddress + 4 * index + 4)) / 4;
+                                imm = (labels[content[3]] - (StartInstrAddress + 4 * index + 4)) / 4;
                                 break;
                             case 6: //blez r,l
                                 CheckArgs(content, 3, input[index]);
                                 CheckKeys(RegToNum, content[1..2], "registrador", input[index]);
                                 rs = RegToNum[content[1]];
-                                imm = (labels[content[2]] - (StartAddress + 4 * index + 4)) / 4;
+                                imm = (labels[content[2]] - (StartInstrAddress + 4 * index + 4)) / 4;
                                 break;
                             case 0xa: //slti r,r,i
                             case 0xd: //ori r,r,i
@@ -507,30 +509,69 @@ namespace TP3
             return result;
         }
 
-        private static string[] LabelsToDict(string[] input, out Dictionary<string, int> labels)
+        /// <summary>
+        ///     Reads the labels in the code and stores them in a dictionary
+        /// </summary>
+        /// <param name="input">Code</param>
+        /// <param name="instrLabels">Dictionary to store the labels to instruction memory address</param>
+        /// <param name="dataLabels">Dictionary to store the labels to data memory address</param>
+        /// <returns></returns>
+        private static string[] LabelsToDict(string[] input, out Dictionary<string, int> instrLabels,
+            out Dictionary<int, int> dataLabels)
         {
-            labels = new Dictionary<string, int>();
-            input = input.Where(x => !string.IsNullOrWhiteSpace(x) && !Regex.IsMatch(x, @"\.\w*")).ToArray();
+            instrLabels = new Dictionary<string, int>();
+            dataLabels = new Dictionary<int, int>();
 
-            int currentAddress = 0;
+            input = input.Where(x => !string.IsNullOrWhiteSpace(x) && Regex.IsMatch(x, @"^\s*(\.(text|data))|\w*"))
+                .ToArray();
+
+            bool isInstr = true;
+            int currentInstrAddress = 0;
+            int currentDataAddress = 0;
 
             for (int i = 0; i < input.Length; i++)
             {
                 input[i] = input[i].Trim();
 
-                Match labelSearch = Regex.Match(input[i], @"^[\w|\d]+:");
-                if (labelSearch.Success)
+                //If .data is found, switch label saving and address to data memory
+                Match categorySearch = Regex.Match(input[i], @"^\s*\.(text|data)");
+                if (categorySearch.Success)
                 {
-                    string label = labelSearch.Value.Substring(0, labelSearch.Value.Length - 1);
-                    labels[label] = StartAddress + 4 * currentAddress;
-                    input[i] = input[i].Substring(labelSearch.Index + labelSearch.Length).Trim();
-                    if (input[i].Length <= 0) { continue; }
+                    isInstr = categorySearch.Groups[1].Value switch
+                    {
+                        "text" => true,
+                        "data" => false,
+                        _ => isInstr
+                    };
                 }
 
-                currentAddress++;
+
+                if (isInstr)
+                {
+                    Match labelSearch = Regex.Match(input[i], @"^([\w|\d]+):");
+                    if (labelSearch.Success)
+                    {
+                        instrLabels[labelSearch.Groups[1].Value] = StartInstrAddress + 4 * currentInstrAddress;
+                        input[i] = input[i][(labelSearch.Index + labelSearch.Length)..].Trim();
+                        if (input[i].Length <= 0) { continue; }
+                    }
+
+                    currentInstrAddress++;
+                }
+                else
+                {
+                    Match labelSearch = Regex.Match(input[i], @"^\s*[\w|\d]+:\s+\.word\s+(\d+)");
+                    if (labelSearch.Success)
+                    {
+                        dataLabels[StartMemoryAddress + 4 * currentDataAddress] =
+                            Convert.ToInt32(labelSearch.Groups[1].Value);
+                        currentDataAddress++;
+                        input[i] = "";
+                    }
+                }
             }
 
-            input = input.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            input = input.Where(x => !string.IsNullOrWhiteSpace(x) && !Regex.IsMatch(x, @"^\s*\.\w*")).ToArray();
 
             return input;
         }
